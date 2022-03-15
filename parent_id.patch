@@ -1,0 +1,20 @@
+diff --git a/workbench b/workbench
+index 1c79a78..0ad88b4 100755
+--- a/workbench
++++ b/workbench
+@@ -97,8 +97,14 @@ def create():
+ 
+         # If a node with an ID that matches the current item's 'parent_id'
+         # value has just been created, make the item a child of the node.
++        row['field_part_of'] = ""
+         if 'parent_id' in row.keys() and row['parent_id'] in node_ids:
+-            row['field_member_of'] = node_ids[row['parent_id']]
++            if row['field_model'] == "Page":
++                row['field_part_of'] = node_ids[row['parent_id']]
++                if "field_part_of" not in csv_column_headers:
++                    csv_column_headers.append("field_part_of")
++            else:
++                row['field_member_of'] = node_ids[row['parent_id']]
+ 
+         # For children whose parent node was created in the 'primary' job.
+         # The secondary task data file contains the names of the YAML config
