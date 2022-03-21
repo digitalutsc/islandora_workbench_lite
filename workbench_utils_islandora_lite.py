@@ -193,17 +193,18 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
         try:
             media_response = issue_request(config, 'POST', media_endpoint_path, media_headers, media_json)
 
-            if len(media_use_tids) > 1:
-                media_response_body = json.loads(media_response.text)
-                if 'mid' in media_response_body:
-                    media_id = media_response_body['mid'][0]['value']
-                    patch_media_use_terms(config, media_id, media_type, media_use_tids)
-                else:
-                    logging.error("Could not PATCH additional media use terms to media created from '%s' because media ID is not available.", filename)
-
-
             allowed_media_response_codes = [201, 204]
             if media_response.status_code in allowed_media_response_codes:
+
+                if len(media_use_tids) > 1:
+                    media_response_body = json.loads(media_response.text)
+                    if 'mid' in media_response_body:
+                        media_id = media_response_body['mid'][0]['value']
+                        patch_media_use_terms(config, media_id, media_type, media_use_tids)
+                    else:
+                        logging.error("Could not PATCH additional media use terms to media created from '%s' because media ID is not available.", filename)
+
+
                 print("media successfully created")
                 media_json = json.loads(media_response.text)
                 mid = media_json['mid'][0]['value']
@@ -234,6 +235,7 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
 
                 return node_response.status_code
             else:
+                print("media creation failed")
                 return False
         except requests.exceptions.RequestException as e:
             logging.error(e)
