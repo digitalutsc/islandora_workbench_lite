@@ -3,7 +3,7 @@ host: "https://islandora.traefik.me"
 username: admin
 password: password
 input_csv: 'https://docs.google.com/spreadsheets/d/1DduGYHGL6Z3p0TsdhrnspUJtNyLWvXdnY18hQ9KDNFE/edit?usp=sharing'
-google_sheets_gid: 1961528959
+google_sheets_gid: 310889652
 content_type: islandora_object
 subdelimiter: "|"
 allow_adding_terms: true
@@ -11,6 +11,7 @@ media_types:
  - file: ['zip', 'tar']
  - document: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'vtt', 'csv']
  - image: ['png', 'gif', 'jpg', 'jpeg', 'tif', 'tiff', 'jp2']
- - audio: ['mp3', 'wav', 'aac']
+ - audio: ['mp3', 'wav', 'aac', 'm4a']
  - video: ['mp4']
  - extracted_text: ['txt']
+input_dir: input_data/repo_sample_objects
