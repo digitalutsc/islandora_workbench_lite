@@ -220,6 +220,15 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
                     "target_type": 'media'
                 }]
 
+                # If append_media is True
+                if "append_media" in config and config["append_media"] == True:
+                    node_media_list = get_node_media_from_nid(config, node_csv_row['node_id'])
+
+                    if len(node_media_list) > 0:
+                        current_media = {"target_id": mid, "target_type": 'media'}
+                        node_media_list.append(current_media)
+                        node['field_islandora_object_media'] = node_media_list
+
                 node_endpoint = config['host'] + '/node/' + node_csv_row['node_id'] + '?_format=json'
                 node_headers = {'Content-Type': 'application/json'}
                 node_response = issue_request(config, 'PATCH', node_endpoint, node_headers, node)
@@ -247,4 +256,15 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
     if file_result is None:
         return file_result
 
+def get_node_media_from_nid(config, node_id):
+    """Get node field_islandora_object_media from Drupal.
+
+    """
+    node_url = config['host'] + '/node/' + node_id + '?_format=json'
+    node_response = issue_request(config, 'GET', node_url)
+    if node_response.status_code == 200:
+        node_dict = json.loads(node_response.text)
+        return node_dict['field_islandora_object_media']
+    else:
+        return False
 
