@@ -27,7 +27,8 @@ def set_config_defaults_islandora_lite(config):
         'audio': 'field_media_audio_file',
         'video': 'field_media_video_file',
         'extracted_text': 'field_media_file',
-        'fits_technical_metadata': 'field_media_file'
+        'fits_technical_metadata': 'field_media_file',
+        'web_archive': 'field_media_file'        
     })
     if 'media_file_fields' in config:
         for media_field in config['media_file_fields']:
