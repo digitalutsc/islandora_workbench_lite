@@ -75,13 +75,12 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
     if config['nodes_only'] is True:
         return
 
-    validate_file_name(filename)
-
     # If remote video, don't create file
     file_result = "remote_video"
     if "field_media_oembed_video" in node_csv_row and len(node_csv_row["field_media_oembed_video"]) > 0:
         print("remote video, skip creating file")
     else:
+        validate_file_name(filename)
         file_result = create_file(config, filename, "file", node_csv_row, node_id)
 
     if file_result == "remote_video" or isinstance(file_result, int):
@@ -133,9 +132,6 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
             }],
             "status": [{
                 "value": True
-            }],
-            "name": [{
-                "value": node_csv_row['title']
             }],
             "name": [{
                 "value": node_csv_row['title']
