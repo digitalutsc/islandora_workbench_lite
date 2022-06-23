@@ -153,7 +153,7 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
 
         if "field_base_url" in node_csv_row and len(node_csv_row["field_base_url"]) > 0:
             media_json["field_base_url"] = [{
-                "value": node_csv_row['field_base_url']
+                "uri": node_csv_row['field_base_url']
             }]
 
         file_result_multi = False
