@@ -77,9 +77,14 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
 
     validate_file_name(filename)
 
-    file_result = create_file(config, filename, "file", node_csv_row, node_id)
+    # If remote video, don't create file
+    file_result = "remote_video"
+    if "field_media_oembed_video" in node_csv_row and len(node_csv_row["field_media_oembed_video"]) > 0:
+        print("remote video, skip creating file")
+    else:
+        file_result = create_file(config, filename, "file", node_csv_row, node_id)
 
-    if isinstance(file_result, int):
+    if file_result == "remote_video" or isinstance(file_result, int):
 
         if filename.startswith('http'):
             parts = urllib.parse.urlparse(filename)
@@ -87,6 +92,9 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
         media_type = set_media_type(config, filename, "file", node_csv_row)
         media_field = config['media_fields'][media_type]
 
+        # Set mediatype for remote_video
+        if file_result == "remote_video":
+            media_type = "remote_video"
 
         media_use_tid_value = node_csv_row['media_use_tid']
         media_use_tids = []
@@ -118,15 +126,6 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
             except:
                 logging.error("Unable to update FITS info")
 
-        # Put custom thumbnail if it exists
-        file_result_thumbnail = False
-        if "field_custom_thumbnail" in node_csv_row and len(node_csv_row["field_custom_thumbnail"]) > 0:
-            node_csv_row_for_thumbnail = dict(node_csv_row)
-
-            node_csv_row_for_thumbnail["file"] = node_csv_row["field_custom_thumbnail"]
-            validate_file_name(node_csv_row["field_custom_thumbnail"])
-            file_result_thumbnail = create_file(config, node_csv_row["field_custom_thumbnail"], node_csv_row_for_thumbnail)
-
         media_json = {
             "bundle": [{
                 "target_id": media_type,
@@ -144,12 +143,18 @@ def create_media_islandora_lite(config, filename, node_id, node_csv_row):
             "field_media_use": [{
                 "target_id": media_use_tids[0],
                 "target_type": 'taxonomy_term'
-            }],
-            media_field: [{
+            }]
+        }
+
+        if "field_media_oembed_video" in node_csv_row and len(node_csv_row["field_media_oembed_video"]) > 0:
+            media_json["field_media_oembed_video"] = [{
+                "value": node_csv_row['field_media_oembed_video']
+            }]
+        else:
+            media_json[media_field] = [{
                 "target_id": file_result,
                 "target_type": 'file'
             }]
-        }
 
         if "field_base_url" in node_csv_row and len(node_csv_row["field_base_url"]) > 0:
             media_json["field_base_url"] = [{
