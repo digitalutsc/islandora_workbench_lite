@@ -1,20 +1,20 @@
 diff --git a/workbench b/workbench
-index fd2bd2e..9ef1c6f 100755
+index 9df82f2..43001fd 100755
 --- a/workbench
 +++ b/workbench
-@@ -100,8 +100,14 @@ def create():
+@@ -111,8 +111,14 @@ def create():
  
          # If a node with an ID that matches the current item's 'parent_id'
          # value has just been created, make the item a child of the node.
 +        row['field_part_of'] = ""
          if 'parent_id' in row.keys() and row['parent_id'] in node_ids:
 -            row['field_member_of'] = node_ids[row['parent_id']]
-+            if row['field_model'] == "Page" or row['field_model'] == "Publication Issue":
++            if row['field_model'] == "Page":
 +                row['field_part_of'] = node_ids[row['parent_id']]
 +                if "field_part_of" not in csv_column_headers:
 +                    csv_column_headers.append("field_part_of")
 +            else:
 +                row['field_member_of'] = node_ids[row['parent_id']]
  
-         # For children whose parent node was created in the 'primary' job.
-         # The secondary task data file contains the names of the YAML config
+         # For children whose parent node was created in the primary task. The ISLANDORA_WORKBENCH_SECONDARY_TASKS
+         # environment variable (set by the primary task) contains the names of the config files registered in the
