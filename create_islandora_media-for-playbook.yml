@@ -1,4 +1,4 @@
-task: add_media_islandora_lite
+task: add_media
 host: "http://localhost:8000/"
 username: admin
 password: islandora

@@ -1,0 +1,85 @@
+--- a/workbench_utils.py
++++ b/workbench_utils.py
+@@ -3061,6 +3061,17 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
+                  it doesn't have sufficient information to create the media, or None
+                  if config['nodes_only'] is True.
+     """
++    def get_node_media_from_nid(config, node_id):
++        """Get node field_islandora_object_media from Drupal.
++        """
++        node_url = config['host'] + '/node/' + node_id + '?_format=json'
++        node_response = issue_request(config, 'GET', node_url)
++        if node_response.status_code == 200:
++            node_dict = json.loads(node_response.text)
++            return node_dict['field_islandora_object_media']
++        else:
++            return False
++    
+     if config['nodes_only'] is True:
+         return
+ 
+@@ -3155,10 +3166,6 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
+                 media_field: [{
+                     "value": filename
+                 }],
+-                "field_media_of": [{
+-                    "target_id": int(node_id),
+-                    "target_type": 'node'
+-                }],
+                 "field_media_use": [{
+                     "target_id": media_use_tids[0],
+                     "target_type": 'taxonomy_term'
+@@ -3181,10 +3188,6 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
+                     "target_id": file_result,
+                     "target_type": 'file'
+                 }],
+-                "field_media_of": [{
+-                    "target_id": int(node_id),
+-                    "target_type": 'node'
+-                }],
+                 "field_media_use": [{
+                     "target_id": media_use_tids[0],
+                     "target_type": 'taxonomy_term'
+@@ -3363,6 +3366,40 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
+                 else:
+                     logging.error("Could not PATCH additional media use terms to media created from '%s' because media ID is not available.", filename)
+ 
++            media_response_body = json.loads(media_response.text)
++            if 'mid' in media_response_body:
++                media_id = media_response_body['mid'][0]['value']
++                patch_media_use_terms(config, media_id, media_type, media_use_tids)
++            else:
++                logging.error("Could not PATCH additional media use terms to media created from '%s' because media ID is not available.", filename)
++
++
++            node_media_json = {
++                    'type': [
++                        {'target_id': "islandora_object"}
++                    ],
++                    'field_islandora_object_media': [
++                        {
++                            'target_id': media_id,
++                            'target_type': "media"
++
++                        }
++                    ]
++                }
++
++            # If append_media is True
++            if "append_media" in config and config["append_media"] == True:
++                node_media_list = get_node_media_from_nid(config, csv_row['node_id'])
++
++                if len(node_media_list) > 0:
++                    current_media = {"target_id": media_id, "target_type": 'media'}
++                    node_media_list.append(current_media)
++                    node_media_json['field_islandora_object_media'] = node_media_list
++
++            node_endpoint = config['host'] + '/node/' + csv_row['node_id'] + '?_format=json'
++            node_headers = {'Content-Type': 'application/json'}
++            node_response = issue_request(config, 'PATCH', node_endpoint, node_headers, node_media_json)
++            
+             # Execute media-specific post-create scripts, if any are configured.
+             if 'media_post_create' in config and len(config['media_post_create']) > 0:
+                 for command in config['media_post_create']:
+-- 
+2.34.1

@@ -1,4 +1,4 @@
-task: add_media_islandora_lite
+task: add_media
 host: "https://islandora.traefik.me"
 username: admin
 password: password
