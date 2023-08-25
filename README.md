@@ -40,7 +40,7 @@ cd ..
 
 Apply the patch
 ```bash
-git apply < islandora_workbench_lite/create_media.patch
+git apply --ignore-space-change < islandora_workbench_lite/create_media.patch
 ```
 
 
