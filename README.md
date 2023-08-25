@@ -18,29 +18,14 @@ Switch the commit ID to the one corresponding to this patch
 git checkout 1f6051b6c2c1b60aa588e4c4f3478f4428d5fda9
 ```
 
-Clone this repo
+Get the `create_media` patch
 ```bash
-git clone https://github.com/digitalutsc/islandora_workbench_lite.git
-```
-
-Change into the Islandora Workbench Lite directory
-```bash
-cd islandora_workbench_lite
-```
-
-Switch to the 2023 branch
-```bash
-git checkout 2023
-```
-
-Switch back to the Islandora Workbench Directory
-```bash
-cd ..
+wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/2023/create_media.patch
 ```
 
 Apply the patch
 ```bash
-git apply --ignore-space-change < islandora_workbench_lite/create_media.patch
+git apply --ignore-space-change < create_media.patch
 ```
 
 
