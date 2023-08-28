@@ -1,3 +1,14 @@
+From 4769324f9f3ddd3e4c9c510ae823b3059dff8a1b Mon Sep 17 00:00:00 2001
+From: Hassan El-Sheikha <hmelsheikha@gmail.com>
+Date: Mon, 28 Aug 2023 14:47:38 -0400
+Subject: [PATCH] Create Media Patch
+
+---
+ workbench_utils.py | 55 ++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 46 insertions(+), 9 deletions(-)
+
+diff --git a/workbench_utils.py b/workbench_utils.py
+index d99eb94..bcf8123 100644
 --- a/workbench_utils.py
 +++ b/workbench_utils.py
 @@ -3061,6 +3061,17 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
@@ -67,19 +78,29 @@
 +
 +            # If append_media is True
 +            if "append_media" in config and config["append_media"] == True:
-+                node_media_list = get_node_media_from_nid(config, csv_row['node_id'])
++                node_media_list = get_node_media_from_nid(config, str(node_id))
 +
 +                if len(node_media_list) > 0:
 +                    current_media = {"target_id": media_id, "target_type": 'media'}
 +                    node_media_list.append(current_media)
 +                    node_media_json['field_islandora_object_media'] = node_media_list
 +
-+            node_endpoint = config['host'] + '/node/' + csv_row['node_id'] + '?_format=json'
++            node_endpoint = config['host'] + '/node/' + str(node_id) + '?_format=json'
 +            node_headers = {'Content-Type': 'application/json'}
 +            node_response = issue_request(config, 'PATCH', node_endpoint, node_headers, node_media_json)
 +            
              # Execute media-specific post-create scripts, if any are configured.
              if 'media_post_create' in config and len(config['media_post_create']) > 0:
                  for command in config['media_post_create']:
+@@ -5824,7 +5861,7 @@ def check_file_exists(config, filename):
+ 
+ 
+ def get_preprocessed_file_path(config, file_fieldname, node_csv_row, node_id=None, make_dir=True):
+-    """For remote/downloaded files (other than from providers defined in config['oembed_providers]),
++    """For remote/downloaded files (other than from providers defiend in config['oembed_providers]),
+        generates the path to the local temporary copy and returns that path. For local files or oEmbed URLs,
+        just returns the value of node_csv_row['file'].
+     """
 -- 
 2.34.1
+
