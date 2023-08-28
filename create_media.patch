@@ -1,14 +1,3 @@
-From 4769324f9f3ddd3e4c9c510ae823b3059dff8a1b Mon Sep 17 00:00:00 2001
-From: Hassan El-Sheikha <hmelsheikha@gmail.com>
-Date: Mon, 28 Aug 2023 14:47:38 -0400
-Subject: [PATCH] Create Media Patch
-
----
- workbench_utils.py | 55 ++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 46 insertions(+), 9 deletions(-)
-
-diff --git a/workbench_utils.py b/workbench_utils.py
-index d99eb94..bcf8123 100644
 --- a/workbench_utils.py
 +++ b/workbench_utils.py
 @@ -3061,6 +3061,17 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
