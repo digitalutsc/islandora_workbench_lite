@@ -1,20 +1,27 @@
 diff --git a/workbench b/workbench
-index 9df82f2..43001fd 100755
+index 63232a0..45daa90 100755
 --- a/workbench
 +++ b/workbench
-@@ -111,8 +111,14 @@ def create():
+@@ -113,6 +113,7 @@ def create():
  
-         # If a node with an ID that matches the current item's 'parent_id'
-         # value has just been created, make the item a child of the node.
+         # Since all nodes, both ones just created and also ones created in previous runs of
+         # Workbench, may have entries in the node ID map database, we always query it.
 +        row['field_part_of'] = ""
-         if 'parent_id' in row.keys() and row['parent_id'] in node_ids:
--            row['field_member_of'] = node_ids[row['parent_id']]
-+            if row['field_model'] == "Page":
-+                row['field_part_of'] = node_ids[row['parent_id']]
-+                if "field_part_of" not in csv_column_headers:
-+                    csv_column_headers.append("field_part_of")
-+            else:
-+                row['field_member_of'] = node_ids[row['parent_id']]
- 
-         # For children whose parent node was created in the primary task. The ISLANDORA_WORKBENCH_SECONDARY_TASKS
-         # environment variable (set by the primary task) contains the names of the config files registered in the
+         if config['query_csv_id_to_node_id_map_for_parents'] is True and 'parent_id' in row:
+             query = "select node_id from csv_id_to_node_id_map where csv_id = ?"
+             parent_in_id_map_result = sqlite_manager(config, operation='select', query=query, values=(row['parent_id'],), db_file_path=config['csv_id_to_node_id_map_path'])
+@@ -120,7 +121,13 @@ def create():
+             for parent_in_id_map_row in parent_in_id_map_result:
+                 parents_from_id_map.append(parent_in_id_map_row['node_id'])
+             if len(parents_from_id_map) == 1:
+-                row['field_member_of'] = parents_from_id_map[0]
++                # Page content relation field
++                if row['field_model'] == "Page":
++                    row['field_part_of'] = parents_from_id_map[0]
++                    if "field_part_of" not in csv_column_headers:
++                        csv_column_headers.append("field_part_of")
++                else:
++                    row['field_member_of'] = parents_from_id_map[0]                
+             if len(parents_from_id_map) > 1:
+                 message = f"Query of ID map for parent ID \"{row['parent_id']}\" returned multiple node IDs: {', '.join(parents_from_id_map)}. Skpping population of field_member_of."
+                 logging.warning(message)
