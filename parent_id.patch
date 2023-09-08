@@ -1,16 +1,17 @@
 diff --git a/workbench b/workbench
-index 63232a0..45daa90 100755
+index 63232a0..ff4aa71 100755
 --- a/workbench
 +++ b/workbench
-@@ -113,6 +113,7 @@ def create():
+@@ -113,14 +113,21 @@ def create():
  
          # Since all nodes, both ones just created and also ones created in previous runs of
          # Workbench, may have entries in the node ID map database, we always query it.
 +        row['field_part_of'] = ""
          if config['query_csv_id_to_node_id_map_for_parents'] is True and 'parent_id' in row:
-             query = "select node_id from csv_id_to_node_id_map where csv_id = ?"
+-            query = "select node_id from csv_id_to_node_id_map where csv_id = ?"
++            query = "select node_id from csv_id_to_node_id_map where csv_id = ? order by timestamp desc limit 1"
              parent_in_id_map_result = sqlite_manager(config, operation='select', query=query, values=(row['parent_id'],), db_file_path=config['csv_id_to_node_id_map_path'])
-@@ -120,7 +121,13 @@ def create():
+             parents_from_id_map = []
              for parent_in_id_map_row in parent_in_id_map_result:
                  parents_from_id_map.append(parent_in_id_map_row['node_id'])
              if len(parents_from_id_map) == 1:
