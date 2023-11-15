@@ -1,28 +1,50 @@
 diff --git a/workbench b/workbench
-index 63232a0..ff4aa71 100755
+index 9c00c66..75ef410 100755
 --- a/workbench
 +++ b/workbench
-@@ -113,14 +113,21 @@ def create():
+@@ -67,6 +67,9 @@ def create():
+     csv_data = get_csv_data(config)
+     csv_column_headers = csv_data.fieldnames
+ 
++    field_vocabs = get_field_vocabularies(config, field_definitions, "field_model")
++    page_tid = prepare_term_id(config, field_vocabs, "field_name", "Page")    
++
+     if 'parent_id' in csv_column_headers and config['query_csv_id_to_node_id_map_for_parents'] is False:
+         message = "Only node IDs for parents created during this session will be used (not using the CSV ID to node ID map)."
+         print(message)
+@@ -147,7 +150,10 @@ def create():
+         # If a node with an ID that matches the current item's 'parent_id'
+         # value has just been created, make the item a child of the node.
+         if 'parent_id' in row.keys() and row['parent_id'] in node_ids:
+-            row['field_member_of'] = node_ids[row['parent_id']]
++            if row['field_model'] == "Page" or row['field_model'] == str(page_tid):
++                node['field_part_of'] = [{'target_id': node_ids[row['parent_id']], 'target_type': 'node_type'}]
++            else:            
++                row['field_member_of'] = node_ids[row['parent_id']]
  
          # Since all nodes, both ones just created and also ones created in previous runs of
          # Workbench, may have entries in the node ID map database, we always query it.
-+        row['field_part_of'] = ""
-         if config['query_csv_id_to_node_id_map_for_parents'] is True and 'parent_id' in row:
--            query = "select node_id from csv_id_to_node_id_map where csv_id = ?"
-+            query = "select node_id from csv_id_to_node_id_map where csv_id = ? order by timestamp desc limit 1"
-             parent_in_id_map_result = sqlite_manager(config, operation='select', query=query, values=(row['parent_id'],), db_file_path=config['csv_id_to_node_id_map_path'])
-             parents_from_id_map = []
-             for parent_in_id_map_row in parent_in_id_map_result:
-                 parents_from_id_map.append(parent_in_id_map_row['node_id'])
-             if len(parents_from_id_map) == 1:
--                row['field_member_of'] = parents_from_id_map[0]
-+                # Page content relation field
-+                if row['field_model'] == "Page":
-+                    row['field_part_of'] = parents_from_id_map[0]
-+                    if "field_part_of" not in csv_column_headers:
-+                        csv_column_headers.append("field_part_of")
+@@ -165,7 +171,10 @@ def create():
+                 if parent_node_exists is True:
+                     parent_node_ids_from_id_map.append(parent_in_id_map_row['node_id'])
+             if len(parent_node_ids_from_id_map) == 1:
+-                row['field_member_of'] = parent_node_ids_from_id_map[0]
++                if row['field_model'] == "Page" or row['field_model'] == str(page_tid):
++                    node['field_part_of'] = [{'target_id': parent_node_ids_from_id_map[0], 'target_type': 'node_type'}]
 +                else:
-+                    row['field_member_of'] = parents_from_id_map[0]                
-             if len(parents_from_id_map) > 1:
-                 message = f"Query of ID map for parent ID \"{row['parent_id']}\" returned multiple node IDs: {', '.join(parents_from_id_map)}. Skpping population of field_member_of."
-                 logging.warning(message)
++                    row['field_member_of'] = parent_node_ids_from_id_map[0]
+                 current_parent_node_id = parent_node_ids_from_id_map[0]
+             if len(parent_node_ids_from_id_map) > 1:
+                 message = f"Review your Workbench log for problems with the \"parent_id\" value in row with ID \"{id_field}\" in your input CSV data."
+@@ -263,7 +272,10 @@ def create():
+             # use the in-session node_ids list to track and assign parent node IDs.
+             if config['query_csv_id_to_node_id_map_for_parents'] is False:
+                 if 'parent_id' in row and row['parent_id'] in node_ids.keys():
+-                    node['field_member_of'] = [{'target_id': node_ids[row['parent_id']], 'target_type': 'node_type'}]
++                    if row['field_model'] == "Page" or row['field_model'] == str(page_tid):
++                        node['field_part_of'] = [{'target_id': node_ids[row['parent_id']], 'target_type': 'node_type'}]
++                    else:                       
++                        node['field_member_of'] = [{'target_id': node_ids[row['parent_id']], 'target_type': 'node_type'}]
+ 
+         node_headers = {'Content-Type': 'application/json'}
+         node_endpoint = '/node?_format=json'
