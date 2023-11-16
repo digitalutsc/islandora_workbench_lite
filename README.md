@@ -20,7 +20,7 @@ git checkout b38d37e7ec0e606b55e6545b33859708861e533d
 
 Get and apply the `create_media` patch
 ```bash
-wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/2023/create_media.patch
+wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/2023_nov/create_media.patch
 ```
 ```bash
 git apply --ignore-space-change < create_media.patch
@@ -29,7 +29,7 @@ git apply --ignore-space-change < create_media.patch
 Get and apply the `create_media` patch
 
 ```bash
-wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/2023/parent_id.patch
+wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/2023_nov/parent_id.patch
 ```
 
 ```bash
