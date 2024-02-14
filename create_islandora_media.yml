@@ -7,6 +7,7 @@ google_sheets_gid: 310889652
 content_type: islandora_object
 subdelimiter: "|"
 allow_adding_terms: true
+standalone_media_url: true
 media_types:
  - file: ['zip', 'tar']
  - document: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'vtt', 'csv']
