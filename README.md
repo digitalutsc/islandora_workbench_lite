@@ -8,6 +8,11 @@ Clone Islandora Workbench
 git clone https://github.com/mjordan/islandora_workbench
 ```
 
+Run setup.py script
+```bash
+sudo python3 setup.py install
+```
+
 Change into the Islandora Workbench directory
 ```bash
 cd islandora_workbench
