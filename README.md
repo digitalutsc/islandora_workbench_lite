@@ -31,7 +31,7 @@ wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/2023
 git apply --ignore-space-change < create_media.patch
 ```
 
-Get and apply the `create_media` patch
+Get and apply the `parent_id` patch
 
 ```bash
 wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/2023_nov/parent_id.patch
