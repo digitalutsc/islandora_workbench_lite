@@ -1,10 +1,86 @@
+From 3606a440ddb056e4d96e52f5ef12d6846c29b1bb Mon Sep 17 00:00:00 2001
+From: Shubham <gargshubham2005@gmail.com>
+Date: Fri, 31 Jan 2025 14:51:00 -0500
+Subject: [PATCH] Rebased the workbench utils and applied create_media patch
+
+---
+ workbench_utils.py | 112 ++++++++++++++++++++++++++++++---------------
+ 1 file changed, 76 insertions(+), 36 deletions(-)
+
 diff --git a/workbench_utils.py b/workbench_utils.py
-index d667a8a..a9e64a1 100644
+index 4efa199..3aaf2de 100644
 --- a/workbench_utils.py
 +++ b/workbench_utils.py
-@@ -3352,6 +3352,18 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
-                  it doesn't have sufficient information to create the media, or None
-                  if config['nodes_only'] is True.
+@@ -1935,8 +1935,7 @@ def check_input(config, args):
+             "task",
+             "host",
+             "username",
+-            "password",
+-            "media_type",
++            "password"
+         ]
+         for add_media_required_option in add_media_required_options:
+             if add_media_required_option not in config_keys:
+@@ -1953,8 +1952,7 @@ def check_input(config, args):
+             "host",
+             "username",
+             "password",
+-            "input_csv",
+-            "media_type",
++            "input_csv"
+         ]
+         for update_media_required_option in update_media_required_options:
+             if update_media_required_option not in config_keys:
+@@ -2192,36 +2190,6 @@ def check_input(config, args):
+     else:
+         csv_column_headers = csv_data.fieldnames
+ 
+-    if config["task"] in ["add_media", "update_media"]:
+-        field_definitions = get_field_definitions(config, "media", config["media_type"])
+-        base_media_fields = ["status", "uid", "langcode"]
+-        drupal_fieldnames = []
+-        for drupal_fieldname in field_definitions:
+-            drupal_fieldnames.append(drupal_fieldname)
+-
+-        for csv_column_header in csv_column_headers:
+-            if (
+-                csv_column_header not in drupal_fieldnames
+-                and csv_column_header != "media_id"
+-                and csv_column_header != "file"
+-                and csv_column_header != "node_id"
+-                and csv_column_header not in base_media_fields
+-            ):
+-                logging.error(
+-                    "CSV column header %s does not match any Drupal field names in the %s media type",
+-                    csv_column_header,
+-                    config["media_type"],
+-                )
+-                sys.exit(
+-                    'Error: CSV column header "'
+-                    + csv_column_header
+-                    + '" does not match any Drupal field names in the "'
+-                    + config["media_type"]
+-                    + '" media type.'
+-                )
+-        message = "OK, CSV column headers match Drupal field names."
+-        print(message)
+-        logging.info(message)
+ 
+     # Check whether each row contains the same number of columns as there are headers.
+     row_count = 0
+@@ -3218,6 +3186,9 @@ def check_input(config, args):
+         and "file" in csv_column_headers
+     ):
+         if (
++            config["task"] == "add_media"
++            or config["task"] == "update_media"
++            and "file" in csv_column_headers or
+             config["nodes_only"] is False
+             and config["paged_content_from_directories"] is False
+         ):
+@@ -5135,6 +5106,18 @@ def create_media(
+           it doesn't have sufficient information to create the media, or None
+           if config['nodes_only'] is True.
      """
 +
 +    def get_node_media_from_nid(config, node_id):
@@ -17,35 +93,29 @@ index d667a8a..a9e64a1 100644
 +            return node_dict['field_islandora_object_media']
 +        else:
 +            return False
-+
-     if config['nodes_only'] is True:
-         return
++    
+     if config["nodes_only"] is True:
+         return None
  
-@@ -3446,10 +3458,6 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
-                 media_field: [{
-                     "value": filename
-                 }],
--                "field_media_of": [{
--                    "target_id": int(node_id),
--                    "target_type": 'node'
--                }],
-                 "field_media_use": [{
-                     "target_id": media_use_tids[0],
-                     "target_type": 'taxonomy_term'
-@@ -3469,10 +3477,6 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
-                     "target_id": file_result,
-                     "target_type": 'file'
-                 }],
--                "field_media_of": [{
--                    "target_id": int(node_id),
--                    "target_type": 'node'
--                }],
-                 "field_media_use": [{
-                     "target_id": media_use_tids[0],
-                     "target_type": 'taxonomy_term'
-@@ -3654,6 +3658,65 @@ def create_media(config, filename, file_fieldname, node_id, csv_row, media_use_t
-                 else:
-                     logging.error("Could not PATCH additional media use terms to media created from '%s' because media ID is not available.", filename)
+@@ -5274,7 +5257,6 @@ def create_media(
+                 ],
+                 "name": [{"value": media_name}],
+                 media_field: [{"value": filename}],
+-                "field_media_of": [{"target_id": int(node_id), "target_type": "node"}],
+                 "field_media_use": [
+                     {"target_id": media_use_tids[0], "target_type": "taxonomy_term"}
+                 ],
+@@ -5290,7 +5272,6 @@ def create_media(
+                 ],
+                 "name": [{"value": media_name}],
+                 media_field: [{"target_id": file_result, "target_type": "file"}],
+-                "field_media_of": [{"target_id": int(node_id), "target_type": "node"}],
+                 "field_media_use": [
+                     {"target_id": media_use_tids[0], "target_type": "taxonomy_term"}
+                 ],
+@@ -5561,6 +5542,65 @@ def create_media(
+                         filename,
+                     )
  
 +            # Update the node reference field
 +            if media_response.status_code == 201:
@@ -107,5 +177,8 @@ index d667a8a..a9e64a1 100644
 +                    logging.error("PATCH to the node after media was created failed.")
 +
              # Execute media-specific post-create scripts, if any are configured.
-             if 'media_post_create' in config and len(config['media_post_create']) > 0:
-                 for command in config['media_post_create']:
+             if "media_post_create" in config and len(config["media_post_create"]) > 0:
+                 for command in config["media_post_create"]:
+-- 
+2.47.1.windows.1
+

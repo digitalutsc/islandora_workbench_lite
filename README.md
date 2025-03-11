@@ -15,7 +15,7 @@ cd islandora_workbench
 
 Switch the commit ID to the one corresponding to this patch
 ```bash
-git checkout b38d37e7ec0e606b55e6545b33859708861e533d
+git checkout 1df2644ba1de4064f868de9564a1515e40afc070
 ```
 
 Run setup.py script
