@@ -25,8 +25,11 @@ sudo python3 setup.py install
 
 Get and apply the `create_media` patch
 ```bash
-wget https://raw.githubusercontent.com/Kxka/islandora_workbench_lite/rebase/create_media.patch```
-```bash
+wget https://raw.githubusercontent.com/Kxka/islandora_workbench_lite/rebase/create_media.patch
+```
+
+bash
+```
 git apply --ignore-space-change < create_media.patch
 ```
 
