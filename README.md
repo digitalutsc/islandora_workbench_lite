@@ -24,7 +24,7 @@ git checkout 0b058a6ca8f6807f18de24c2dd2c82f3d831a6eb
 
 Get and apply the `create_media` patch
 ```bash
-wget https://raw.githubusercontent.com/Kxka/islandora_workbench_lite/rebase/create_media.patch
+wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/refs/heads/main/create_media.patch
 ```
 
 bash
