@@ -1,17 +1,8 @@
-From 3606a440ddb056e4d96e52f5ef12d6846c29b1bb Mon Sep 17 00:00:00 2001
-From: Shubham <gargshubham2005@gmail.com>
-Date: Fri, 31 Jan 2025 14:51:00 -0500
-Subject: [PATCH] Rebased the workbench utils and applied create_media patch
-
----
- workbench_utils.py | 112 ++++++++++++++++++++++++++++++---------------
- 1 file changed, 76 insertions(+), 36 deletions(-)
-
 diff --git a/workbench_utils.py b/workbench_utils.py
-index 4efa199..3aaf2de 100644
+index 6d41d2b..572085b 100644
 --- a/workbench_utils.py
 +++ b/workbench_utils.py
-@@ -1935,8 +1935,7 @@ def check_input(config, args):
+@@ -2095,8 +2095,7 @@ def check_input(config, args):
              "task",
              "host",
              "username",
@@ -21,7 +12,7 @@ index 4efa199..3aaf2de 100644
          ]
          for add_media_required_option in add_media_required_options:
              if add_media_required_option not in config_keys:
-@@ -1953,8 +1952,7 @@ def check_input(config, args):
+@@ -2113,8 +2112,7 @@ def check_input(config, args):
              "host",
              "username",
              "password",
@@ -31,11 +22,11 @@ index 4efa199..3aaf2de 100644
          ]
          for update_media_required_option in update_media_required_options:
              if update_media_required_option not in config_keys:
-@@ -2192,36 +2190,6 @@ def check_input(config, args):
+@@ -2360,37 +2358,6 @@ def check_input(config, args):
      else:
          csv_column_headers = csv_data.fieldnames
- 
--    if config["task"] in ["add_media", "update_media"]:
+
+-    if config["task"] in ["add_media", "update_media", "update_media_by_node"]:
 -        field_definitions = get_field_definitions(config, "media", config["media_type"])
 -        base_media_fields = ["status", "uid", "langcode"]
 -        drupal_fieldnames = []
@@ -49,9 +40,10 @@ index 4efa199..3aaf2de 100644
 -                and csv_column_header != "file"
 -                and csv_column_header != "node_id"
 -                and csv_column_header not in base_media_fields
+-                and csv_column_header not in get_additional_files_config(config).keys()
 -            ):
 -                logging.error(
--                    "CSV column header %s does not match any Drupal field names in the %s media type",
+-                    'CSV column header "%s" does not match any Drupal field names in the "%s" media type',
 -                    csv_column_header,
 -                    config["media_type"],
 -                )
@@ -65,10 +57,10 @@ index 4efa199..3aaf2de 100644
 -        message = "OK, CSV column headers match Drupal field names."
 -        print(message)
 -        logging.info(message)
- 
+
      # Check whether each row contains the same number of columns as there are headers.
      row_count = 0
-@@ -3218,6 +3186,9 @@ def check_input(config, args):
+@@ -3540,6 +3507,9 @@ def check_input(config, args):
          and "file" in csv_column_headers
      ):
          if (
@@ -78,7 +70,7 @@ index 4efa199..3aaf2de 100644
              config["nodes_only"] is False
              and config["paged_content_from_directories"] is False
          ):
-@@ -5135,6 +5106,18 @@ def create_media(
+@@ -5595,6 +5565,18 @@ def create_media(
            it doesn't have sufficient information to create the media, or None
            if config['nodes_only'] is True.
      """
@@ -93,11 +85,11 @@ index 4efa199..3aaf2de 100644
 +            return node_dict['field_islandora_object_media']
 +        else:
 +            return False
-+    
++
      if config["nodes_only"] is True:
          return None
- 
-@@ -5274,7 +5257,6 @@ def create_media(
+
+@@ -5734,7 +5716,6 @@ def create_media(
                  ],
                  "name": [{"value": media_name}],
                  media_field: [{"value": filename}],
@@ -105,7 +97,7 @@ index 4efa199..3aaf2de 100644
                  "field_media_use": [
                      {"target_id": media_use_tids[0], "target_type": "taxonomy_term"}
                  ],
-@@ -5290,7 +5272,6 @@ def create_media(
+@@ -5750,7 +5731,6 @@ def create_media(
                  ],
                  "name": [{"value": media_name}],
                  media_field: [{"target_id": file_result, "target_type": "file"}],
@@ -113,23 +105,23 @@ index 4efa199..3aaf2de 100644
                  "field_media_use": [
                      {"target_id": media_use_tids[0], "target_type": "taxonomy_term"}
                  ],
-@@ -5561,6 +5542,65 @@ def create_media(
+@@ -6021,6 +6001,65 @@ def create_media(
                          filename,
                      )
- 
+
 +            # Update the node reference field
 +            if media_response.status_code == 201:
 +
 +                media_response_body = json.loads(media_response.text)
 +                if 'mid' in media_response_body:
 +                    media_id = media_response_body['mid'][0]['value']
-+                else: 
++                else:
 +                    logging.error("Could not PATCH node or additional media use terms to media created from '%s' because media ID is not available.", filename)
 +                    raise Exception("Unable to get media_id")
 +
 +                if len(media_use_tids) > 1:
 +                     patch_media_use_terms(config, media_id, media_type, media_use_tids)
-+                     
++
 +                node_media_json = {
 +                        'type': [
 +                            {'target_id': "islandora_object"}
@@ -150,7 +142,7 @@ index 4efa199..3aaf2de 100644
 +                    for media_item in node_media_list:
 +                        target_id = None
 +                        if "target_type" in media_item:
-+                            target_id = media_item["target_id"]                        
++                            target_id = media_item["target_id"]
 +                        target_type = None
 +                        if "target_type" in media_item:
 +                            target_type = media_item["target_type"]
@@ -163,7 +155,7 @@ index 4efa199..3aaf2de 100644
 +                                raise Exception("Invalid media reference for " + node_id)
 +                        else:
 +                            pruned_node_media_list.append(media_item)
-+                    
++
 +                    if len(pruned_node_media_list) > 0:
 +                        current_media = {"target_id": media_id, "target_type": 'media'}
 +                        pruned_node_media_list.append(current_media)
@@ -172,13 +164,17 @@ index 4efa199..3aaf2de 100644
 +                node_endpoint = config['host'] + '/node/' + str(node_id) + '?_format=json'
 +                node_headers = {'Content-Type': 'application/json'}
 +                node_response = issue_request(config, 'PATCH', node_endpoint, node_headers, node_media_json)
-+            
++
 +                if node_response.status_code != 200:
 +                    logging.error("PATCH to the node after media was created failed.")
 +
              # Execute media-specific post-create scripts, if any are configured.
              if "media_post_create" in config and len(config["media_post_create"]) > 0:
                  for command in config["media_post_create"]:
--- 
-2.47.1.windows.1
-
+@@ -12791,4 +12830,4 @@ def is_running_in_docker():
+     if "ISLANDORA_WORKBENCH_IS_RUNNING_IN_DOCKER" in os.environ:
+         return True
+     else:
+-        return False
++        return False
+\ No newline at end of file
