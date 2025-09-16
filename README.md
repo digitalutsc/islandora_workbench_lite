@@ -1,6 +1,10 @@
 # islandora_workbench_lite
 
-This patch for Islandora Workbench corresponds to commit ID 520f81220e65e69ade197f85dcc6f1d437df2440
+This patch for Islandora Workbench corresponds to commit ID 0b058a6ca8f6807f18de24c2dd2c82f3d831a6eb
+
+## Instalation 
+
+Follow the steps in [the islandora_workbench](https://mjordan.github.io/islandora_workbench_docs/installation/)
 
 ## Usage
 Clone Islandora Workbench
@@ -15,12 +19,7 @@ cd islandora_workbench
 
 Switch the commit ID to the one corresponding to this patch
 ```bash
-git checkout 520f81220e65e69ade197f85dcc6f1d437df2440
-```
-
-Run setup.py script
-```bash
-sudo python3 setup.py install
+git checkout 0b058a6ca8f6807f18de24c2dd2c82f3d831a6eb
 ```
 
 Get and apply the `create_media` patch
@@ -36,7 +35,7 @@ git apply --ignore-space-change < create_media.patch
 Get and apply the `parent_id` patch
 
 ```bash
-wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/2023_nov/parent_id.patch
+wget https://raw.githubusercontent.com/digitalutsc/islandora_workbench_lite/refs/heads/main/parent_id.patch
 ```
 
 ```bash
