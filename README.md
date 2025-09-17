@@ -1,6 +1,6 @@
 # islandora_workbench_lite
 
-This patch for Islandora Workbench corresponds to commit ID 0b058a6ca8f6807f18de24c2dd2c82f3d831a6eb
+This patch for Islandora Workbench corresponds to commit ID 3373db618c90d9530deb52437573c32d95dcf9c4
 
 ## Instalation 
 
@@ -19,7 +19,7 @@ cd islandora_workbench
 
 Switch the commit ID to the one corresponding to this patch
 ```bash
-git checkout 0b058a6ca8f6807f18de24c2dd2c82f3d831a6eb
+git checkout 3373db618c90d9530deb52437573c32d95dcf9c4
 ```
 
 Get and apply the `create_media` patch

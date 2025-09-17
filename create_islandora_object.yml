@@ -1,5 +1,5 @@
 task: create
-host: "https://islandora.traefik.me"
+host: "https://islandora.dev"
 username: admin
 password: password
 input_csv: 'https://docs.google.com/spreadsheets/d/1DduGYHGL6Z3p0TsdhrnspUJtNyLWvXdnY18hQ9KDNFE/edit?usp=sharing'
